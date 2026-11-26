@@ -1,0 +1,6 @@
+{
+  "name": "Classroom Sound Intelligence",
+  "description": "Smart Classroom Noise Monitoring System by Master Creation (v2.0) with real-time dBFS metering, 3-beep alerts, charts, history, and CSV export.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

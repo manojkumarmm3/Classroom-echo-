@@ -1,0 +1,3462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#050A18" />
+  <title>Classroom Sound Intelligence v2.0 — Master Creation</title>
+  <style>
+    :root {
+      --bg-primary: #050A18;
+      --bg-secondary: #081329;
+      --panel-bg: rgba(12, 23, 46, 0.82);
+      --panel-solid: #0C172E;
+      --panel-border: rgba(0, 229, 255, 0.16);
+      --panel-border-strong: rgba(0, 229, 255, 0.36);
+      --cyan: #00E5FF;
+      --blue: #2979FF;
+      --green: #00E676;
+      --yellow: #FFCA28;
+      --red: #FF3D57;
+      --text-primary: #FFFFFF;
+      --text-secondary: #9FB2CC;
+      --text-muted: #6C82A3;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-glow: 0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.45;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(0, 229, 255, 0.11), transparent 42%),
+        radial-gradient(circle at 88% 18%, rgba(41, 121, 255, 0.13), transparent 46%),
+        radial-gradient(circle at 50% 95%, rgba(0, 229, 255, 0.06), transparent 48%),
+        linear-gradient(180deg, #050A18 0%, #081329 55%, #050A18 100%);
+      pointer-events: none;
+    }
+
+    body.alert-active::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      border: 3px solid rgba(255, 61, 87, 0.85);
+      box-shadow: inset 0 0 42px rgba(255, 61, 87, 0.34);
+      animation: alertPulseBorder 1.1s ease-in-out infinite;
+    }
+
+    @keyframes alertPulseBorder {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 1; }
+    }
+
+    .app-shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 12px 14px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Glass Panels */
+    .glass-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-glow);
+      padding: 16px;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .glass-card.alert-card {
+      border-color: rgba(255, 61, 87, 0.72);
+      box-shadow: 0 0 28px rgba(255, 61, 87, 0.22), var(--shadow-glow);
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(12, 23, 46, 0.94), rgba(8, 19, 41, 0.9));
+      border: 1px solid var(--panel-border-strong);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.16), rgba(41, 121, 255, 0.22));
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 18px rgba(0, 229, 255, 0.2);
+    }
+
+    .brand-titles {
+      min-width: 0;
+    }
+
+    .brand-kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+
+    .version-chip {
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.14);
+      border: 1px solid rgba(0, 229, 255, 0.32);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    .brand-name {
+      margin: 2px 0 0;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .icon-btn {
+      min-width: 48px;
+      min-height: 48px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border-strong);
+      background: rgba(8, 19, 41, 0.85);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.97);
+    }
+
+    .icon-btn:hover {
+      border-color: var(--cyan);
+      background: rgba(0, 229, 255, 0.12);
+    }
+
+    .header-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(159, 178, 204, 0.12);
+    }
+
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(5, 10, 24, 0.52);
+      border: 1px solid rgba(159, 178, 204, 0.14);
+      border-radius: 10px;
+      padding: 7px 10px;
+      min-width: 0;
+    }
+
+    .meta-pill-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .meta-pill-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mono-value {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .status-not-monitoring {
+      color: #9FB2CC;
+      background: rgba(159, 178, 204, 0.12);
+      border-color: rgba(159, 178, 204, 0.28);
+    }
+
+    .status-initializing {
+      color: var(--cyan);
+      background: rgba(0, 229, 255, 0.14);
+      border-color: rgba(0, 229, 255, 0.45);
+    }
+
+    .status-initializing .status-dot,
+    .status-monitoring .status-dot,
+    .status-high-noise .status-dot {
+      animation: pulseDot 1.3s ease-in-out infinite;
+    }
+
+    .status-monitoring {
+      color: var(--green);
+      background: rgba(0, 230, 118, 0.14);
+      border-color: rgba(0, 230, 118, 0.45);
+    }
+
+    .status-high-noise {
+      color: #FFFFFF;
+      background: rgba(255, 61, 87, 0.88);
+      border-color: #FF7A8C;
+      box-shadow: 0 0 16px rgba(255, 61, 87, 0.45);
+    }
+
+    .status-paused {
+      color: var(--yellow);
+      background: rgba(255, 202, 40, 0.14);
+      border-color: rgba(255, 202, 40, 0.45);
+    }
+
+    .status-error {
+      color: #FF8A98;
+      background: rgba(255, 61, 87, 0.16);
+      border-color: rgba(255, 61, 87, 0.55);
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.55; }
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      background: rgba(8, 19, 41, 0.86);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 6px;
+      position: sticky;
+      top: 6px;
+      z-index: 40;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .nav-tab {
+      min-height: 48px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      padding: 6px 4px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(41, 121, 255, 0.24));
+      border-color: rgba(0, 229, 255, 0.45);
+      color: var(--text-primary);
+      box-shadow: 0 4px 14px rgba(0, 229, 255, 0.14);
+    }
+
+    .tab-panel {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tab-panel.active {
+      display: flex;
+    }
+
+    /* Status Banner */
+    .classroom-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(159, 178, 204, 0.24);
+      background: rgba(12, 23, 46, 0.9);
+      transition: all 0.25s ease;
+      flex-wrap: wrap;
+    }
+
+    .classroom-banner.state-quiet {
+      border-color: rgba(0, 230, 118, 0.45);
+      background: linear-gradient(135deg, rgba(0, 230, 118, 0.14), rgba(12, 23, 46, 0.92));
+    }
+
+    .classroom-banner.state-moderate {
+      border-color: rgba(255, 202, 40, 0.5);
+      background: linear-gradient(135deg, rgba(255, 202, 40, 0.14), rgba(12, 23, 46, 0.92));
+    }
+
+    .classroom-banner.state-high {
+      border-color: rgba(255, 61, 87, 0.78);
+      background: linear-gradient(135deg, rgba(255, 61, 87, 0.26), rgba(12, 23, 46, 0.95));
+      box-shadow: 0 0 26px rgba(255, 61, 87, 0.22);
+    }
+
+    .classroom-banner.state-critical {
+      border-color: #FF3D57;
+      background: linear-gradient(135deg, rgba(255, 61, 87, 0.42), rgba(45, 7, 18, 0.96));
+      box-shadow: 0 0 34px rgba(255, 61, 87, 0.38);
+    }
+
+    .banner-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .banner-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .banner-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .banner-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .banner-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .alert-chip {
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(5, 10, 24, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    /* Notice / Warning Box */
+    .notice-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 61, 87, 0.16);
+      border: 1px solid rgba(255, 61, 87, 0.52);
+      color: #FFD7DD;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .notice-bar.visible {
+      display: flex;
+    }
+
+    .notice-bar.warning {
+      background: rgba(255, 202, 40, 0.14);
+      border-color: rgba(255, 202, 40, 0.48);
+      color: #FFF0BE;
+    }
+
+    /* Main Monitor Grid */
+    .monitor-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 900px) {
+      .monitor-grid {
+        grid-template-columns: 1.05fr 0.95fr;
+      }
+      .nav-tab {
+        flex-direction: row;
+        gap: 8px;
+        font-size: 13.5px;
+      }
+    }
+
+    /* Circular Sound Meter */
+    .meter-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .section-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+      margin: 0;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      color: var(--text-secondary);
+      background: rgba(5, 10, 24, 0.65);
+      border: 1px solid rgba(159, 178, 204, 0.2);
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+    }
+
+    .gauge-wrap {
+      position: relative;
+      width: min(290px, 76vw);
+      height: min(290px, 76vw);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gauge-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .gauge-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: none;
+      padding: 20px;
+    }
+
+    .gauge-reading {
+      font-family: var(--font-mono);
+      font-size: clamp(32px, 8vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .gauge-unit {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .gauge-category {
+      margin-top: 8px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .gauge-substatus {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Horizontal Bar & Threshold Slider */
+    .bar-block {
+      width: 100%;
+      background: rgba(5, 10, 24, 0.56);
+      border: 1px solid rgba(159, 178, 204, 0.14);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 12.5px;
+    }
+
+    .bar-track {
+      position: relative;
+      height: 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      overflow: visible;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #00E676 0%, #00E5FF 45%, #FFCA28 72%, #FF3D57 100%);
+      transition: width 0.09s linear;
+    }
+
+    .bar-threshold-marker {
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      width: 3px;
+      background: #FFFFFF;
+      box-shadow: 0 0 8px #FF3D57;
+      border-radius: 2px;
+      transform: translateX(-50%);
+    }
+
+    .quick-threshold-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .quick-threshold-row label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan);
+      height: 28px;
+      cursor: pointer;
+    }
+
+    .dbfs-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Controls Card */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+
+    .ctrl-btn {
+      min-height: 50px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(8, 19, 41, 0.9);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .ctrl-btn:disabled {
+      opacity: 0.36;
+      cursor: not-allowed;
+    }
+
+    .ctrl-btn:not(:disabled):active {
+      transform: scale(0.97);
+    }
+
+    .ctrl-btn.btn-start {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #00C853, #00E676);
+      color: #03150B;
+      border-color: rgba(0, 230, 118, 0.8);
+      box-shadow: 0 6px 20px rgba(0, 230, 118, 0.24);
+    }
+
+    .ctrl-btn.btn-stop {
+      background: linear-gradient(135deg, rgba(255, 61, 87, 0.22), rgba(255, 61, 87, 0.34));
+      border-color: rgba(255, 61, 87, 0.6);
+      color: #FFD9DF;
+    }
+
+    .ctrl-btn.btn-pause {
+      background: linear-gradient(135deg, rgba(255, 202, 40, 0.18), rgba(255, 202, 40, 0.3));
+      border-color: rgba(255, 202, 40, 0.55);
+      color: #FFF2C6;
+    }
+
+    .ctrl-btn.btn-test {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(41, 121, 255, 0.28));
+      border-color: rgba(0, 229, 255, 0.5);
+      color: #E0FBFF;
+    }
+
+    .ctrl-btn.btn-reset {
+      background: rgba(159, 178, 204, 0.12);
+      border-color: rgba(159, 178, 204, 0.32);
+    }
+
+    .session-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(5, 10, 24, 0.55);
+      border: 1px solid rgba(159, 178, 204, 0.14);
+      font-size: 12.5px;
+    }
+
+    /* 4 Summary Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 680px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .stat-card {
+      background: rgba(8, 19, 41, 0.82);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 13px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-primary);
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Canvas Visualizers */
+    .visuals-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 900px) {
+      .visuals-grid {
+        grid-template-columns: 1.35fr 0.65fr;
+      }
+    }
+
+    .canvas-box {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: rgba(5, 10, 24, 0.72);
+      border: 1px solid rgba(0, 229, 255, 0.14);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .canvas-box canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .canvas-overlay-msg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Forms & Settings */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 840px) {
+      .settings-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 520px) {
+      .field-grid.two-col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .field-val {
+      font-family: var(--font-mono);
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .field input[type="text"],
+    .field input[type="number"] {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(159, 178, 204, 0.24);
+      background: rgba(5, 10, 24, 0.72);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.18);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(5, 10, 24, 0.56);
+      border: 1px solid rgba(159, 178, 204, 0.15);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(159, 178, 204, 0.25);
+      border: 1px solid rgba(159, 178, 204, 0.35);
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      transition: 0.2s;
+    }
+
+    .switch input:checked + .slider {
+      background: rgba(0, 229, 255, 0.35);
+      border-color: var(--cyan);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(22px);
+      background: var(--cyan);
+    }
+
+    /* History & Diagnostics Lists */
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .action-btn {
+      min-height: 48px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--panel-border-strong);
+      background: rgba(0, 229, 255, 0.14);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+    }
+
+    .action-btn.danger {
+      background: rgba(255, 61, 87, 0.16);
+      border-color: rgba(255, 61, 87, 0.5);
+      color: #FFD5DC;
+    }
+
+    .action-btn.secondary {
+      background: rgba(41, 121, 255, 0.18);
+      border-color: rgba(41, 121, 255, 0.5);
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .history-item {
+      background: rgba(5, 10, 24, 0.62);
+      border: 1px solid rgba(159, 178, 204, 0.18);
+      border-radius: 14px;
+      padding: 13px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .history-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+    }
+
+    .hm-box {
+      background: rgba(12, 23, 46, 0.72);
+      border: 1px solid rgba(159, 178, 204, 0.12);
+      border-radius: 8px;
+      padding: 7px 9px;
+    }
+
+    .hm-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .hm-val {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .diag-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .diag-item {
+      background: rgba(5, 10, 24, 0.62);
+      border: 1px solid rgba(159, 178, 204, 0.18);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .diag-k {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .diag-v {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--text-secondary);
+      border: 1px dashed rgba(159, 178, 204, 0.24);
+      border-radius: 14px;
+      background: rgba(5, 10, 24, 0.35);
+    }
+
+    /* Privacy Footer */
+    .privacy-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(8, 19, 41, 0.72);
+      border: 1px solid rgba(0, 230, 118, 0.22);
+      color: var(--text-secondary);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* Confirmation Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(3, 7, 18, 0.78);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 420px;
+      background: var(--panel-solid);
+      border: 1px solid var(--panel-border-strong);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .modal-body {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 250;
+      background: #0D213F;
+      color: #FFFFFF;
+      border: 1px solid var(--cyan);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- DASHBOARD HEADER -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="brand-group">
+          <div class="brand-logo" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" fill="#00E5FF"/>
+              <path d="M5.5 11a6.5 6.5 0 0 0 13 0" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M12 17.5V21M8.5 21h7" stroke="#00E5FF" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M3 8.5c-.6 1.1-.9 2.3-.9 3.5M21 8.5c.6 1.1.9 2.3.9 3.5" stroke="#2979FF" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-titles">
+            <div class="brand-kicker">
+              <span>MASTER CREATION</span>
+              <span class="version-chip">v2.0</span>
+            </div>
+            <h1 class="brand-name">CLASSROOM SOUND INTELLIGENCE</h1>
+            <div class="brand-subtitle">Smart Classroom Noise Monitoring System</div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div id="headerStatusBadge" class="status-badge status-not-monitoring" aria-live="polite">
+            <span class="status-dot"></span>
+            <span id="headerStatusText">NOT MONITORING</span>
+          </div>
+          <button type="button" id="headerSettingsBtn" class="icon-btn" aria-label="Open Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+            </svg>
+            <span>Settings</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <div class="meta-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <div>
+            <span class="meta-pill-label">Date</span>
+            <span id="liveDate" class="meta-pill-value">--</span>
+          </div>
+        </div>
+        <div class="meta-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>
+          </svg>
+          <div>
+            <span class="meta-pill-label">Live Clock</span>
+            <span id="liveClock" class="meta-pill-value mono-value">--:--:--</span>
+          </div>
+        </div>
+        <div class="meta-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" aria-hidden="true">
+            <path d="M3 9l9-6 9 6v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <div>
+            <span class="meta-pill-label">Classroom</span>
+            <span id="headerClassroomName" class="meta-pill-value">Room 101</span>
+          </div>
+        </div>
+        <div class="meta-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <div>
+            <span class="meta-pill-label">Occupancy</span>
+            <span id="headerOccupancy" class="meta-pill-value mono-value">32 / 40</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs" role="tablist" aria-label="Dashboard Sections">
+      <button type="button" class="nav-tab active" data-tab="monitor" role="tab" aria-selected="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+        <span>Monitor</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="history" role="tab" aria-selected="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/>
+        </svg>
+        <span>History</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="settings" role="tab" aria-selected="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
+        </svg>
+        <span>Settings</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="diagnostics" role="tab" aria-selected="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <span>Diagnostics</span>
+      </button>
+    </nav>
+
+    <!-- MONITOR TAB -->
+    <section id="tab-monitor" class="tab-panel active" role="tabpanel">
+      <div id="audioNoticeBar" class="notice-bar" role="alert">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span id="audioNoticeText"></span>
+      </div>
+
+      <!-- Classroom Noise Status Banner -->
+      <div id="classroomBanner" class="classroom-banner">
+        <div class="banner-left">
+          <div class="banner-icon" aria-hidden="true">
+            <svg id="bannerSvg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div>
+            <div id="bannerTitle" class="banner-title">STANDBY — READY TO MONITOR</div>
+            <div id="bannerDesc" class="banner-desc">Press Start Monitoring to analyze real classroom microphone levels locally.</div>
+          </div>
+        </div>
+        <div class="banner-right">
+          <div id="bannerLiveDb" class="alert-chip">--.- dBFS</div>
+          <div id="bannerDetectionProgress" class="alert-chip">Threshold: -25 dBFS</div>
+        </div>
+      </div>
+
+      <div class="monitor-grid">
+        <!-- Main Sound Meter Card -->
+        <div id="meterCard" class="glass-card meter-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+              </svg>
+              Live Sound Level Meter
+            </h2>
+            <span class="section-tag">Relative dBFS</span>
+          </div>
+
+          <div class="gauge-wrap">
+            <svg class="gauge-svg" viewBox="0 0 240 240" aria-label="Circular sound level meter">
+              <defs>
+                <linearGradient id="gaugeGradNormal" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#00E676"/>
+                  <stop offset="48%" stop-color="#00E5FF"/>
+                  <stop offset="78%" stop-color="#FFCA28"/>
+                  <stop offset="100%" stop-color="#FF3D57"/>
+                </linearGradient>
+                <linearGradient id="gaugeGradAlert" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#FF6D00"/>
+                  <stop offset="100%" stop-color="#FF3D57"/>
+                </linearGradient>
+              </defs>
+              <!-- Background Track Arc (270 deg sweep from 135 deg to 405 deg) -->
+              <path id="gaugeBgArc" fill="none" stroke="rgba(159, 178, 204, 0.16)" stroke-width="18" stroke-linecap="round"/>
+              <!-- Active Value Arc -->
+              <path id="gaugeValueArc" fill="none" stroke="url(#gaugeGradNormal)" stroke-width="18" stroke-linecap="round"/>
+              <!-- Threshold Marker Line -->
+              <line id="gaugeThresholdTick" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+              <circle id="gaugeThresholdDot" r="5" fill="#FF3D57" stroke="#FFFFFF" stroke-width="2"/>
+            </svg>
+            <div class="gauge-center">
+              <div id="gaugeReading" class="gauge-reading">--.-</div>
+              <div class="gauge-unit">dBFS (DIGITAL)</div>
+              <div id="gaugeCategory" class="gauge-category">Standby</div>
+              <div id="gaugeSubStatus" class="gauge-substatus">Inactive</div>
+            </div>
+          </div>
+
+          <!-- Horizontal Level Bar -->
+          <div class="bar-block">
+            <div class="bar-labels">
+              <span>Current Noise Level: <strong id="barCurrentText" class="mono-value">--.- dBFS</strong></span>
+              <span>Configured Threshold: <strong id="barThresholdText" class="mono-value">-25 dBFS</strong></span>
+            </div>
+            <div class="bar-track" aria-hidden="true">
+              <div id="barFill" class="bar-fill"></div>
+              <div id="barThresholdMarker" class="bar-threshold-marker" style="left: 68.75%;"></div>
+            </div>
+            <div class="quick-threshold-row">
+              <label for="quickThresholdSlider">Threshold</label>
+              <input id="quickThresholdSlider" type="range" min="-60" max="-5" step="1" value="-25" aria-label="Configure Noise Threshold dBFS" />
+            </div>
+          </div>
+
+          <div class="dbfs-note">
+            Note: dBFS is a relative digital audio level (closer to 0 dBFS = louder), not calibrated dB SPL.
+          </div>
+        </div>
+
+        <!-- Monitoring Controls & Active Session Card -->
+        <div class="glass-card" style="display:flex; flex-direction:column; gap:12px; justify-content:space-between;">
+          <div class="section-header">
+            <h2 class="section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              Monitoring Controls
+            </h2>
+            <span id="micPermChip" class="section-tag">Mic: Checking</span>
+          </div>
+
+          <div class="controls-grid">
+            <button type="button" id="btnStart" class="ctrl-btn btn-start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="6 4 20 12 6 20 6 4"/>
+              </svg>
+              <span>Start Monitoring</span>
+            </button>
+            <button type="button" id="btnPause" class="ctrl-btn btn-pause" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+              </svg>
+              <span>Pause</span>
+            </button>
+            <button type="button" id="btnStop" class="ctrl-btn btn-stop" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="5" y="5" width="14" height="14" rx="2"/>
+              </svg>
+              <span>Stop</span>
+            </button>
+            <button type="button" id="btnTestAlert" class="ctrl-btn btn-test">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              </svg>
+              <span>Test Alert Sound</span>
+            </button>
+            <button type="button" id="btnResetSession" class="ctrl-btn btn-reset">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+              </svg>
+              <span>Reset Session</span>
+            </button>
+          </div>
+
+          <div class="session-strip">
+            <div>Active Duration: <strong id="sessionTimer" class="mono-value">00:00:00</strong></div>
+            <div>Cooldown: <strong id="cooldownStatus" class="mono-value">Ready</strong></div>
+            <div>Sound Alerts: <strong id="soundAlertModeLabel">Enabled</strong></div>
+          </div>
+
+          <!-- 4 Live Summary Stat Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Current Noise</div>
+              <div id="statCurrent" class="stat-value">--.-</div>
+              <div class="stat-sub">dBFS live</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Average Noise</div>
+              <div id="statAvg" class="stat-value">--.-</div>
+              <div class="stat-sub">dBFS session</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Peak Noise</div>
+              <div id="statPeak" class="stat-value">--.-</div>
+              <div class="stat-sub">dBFS max</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">High Noise Events</div>
+              <div id="statEvents" class="stat-value">0</div>
+              <div class="stat-sub">triggered alerts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Sound Graph & Audio Equalizer -->
+      <div class="visuals-grid">
+        <div class="glass-card">
+          <div class="section-header" style="margin-bottom:10px;">
+            <h2 class="section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              Live Sound Monitoring Graph
+            </h2>
+            <span class="section-tag">60s Rolling dBFS</span>
+          </div>
+          <div class="canvas-box">
+            <canvas id="soundGraphCanvas"></canvas>
+            <div id="graphEmptyMsg" class="canvas-overlay-msg">
+              Press Start Monitoring to plot real-time classroom dBFS measurements.
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="section-header" style="margin-bottom:10px;">
+            <h2 class="section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="4" y1="20" x2="4" y2="10"/><line x1="9" y1="20" x2="9" y2="4"/><line x1="14" y1="20" x2="14" y2="13"/><line x1="19" y1="20" x2="19" y2="7"/>
+              </svg>
+              Live Audio Equalizer
+            </h2>
+            <span id="eqStateTag" class="section-tag">Inactive</span>
+          </div>
+          <div class="canvas-box">
+            <canvas id="eqCanvas"></canvas>
+            <div id="eqEmptyMsg" class="canvas-overlay-msg">
+              Frequency spectrum inactive while microphone is stopped.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY TAB -->
+    <section id="tab-history" class="tab-panel" role="tabpanel">
+      <div class="glass-card">
+        <div class="toolbar-row">
+          <div>
+            <h2 class="section-title">Monitoring History &amp; Reports</h2>
+            <div style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
+              Completed session metrics and alert timestamps saved locally. No audio is ever stored.
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" id="btnExportSessionsCsv" class="action-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Export Sessions CSV</span>
+            </button>
+            <button type="button" id="btnExportAlertsCsv" class="action-btn secondary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              <span>Export Alert Events CSV</span>
+            </button>
+            <button type="button" id="btnClearHistory" class="action-btn danger">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
+              </svg>
+              <span>Clear History</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="historyList" class="history-list"></div>
+
+      <div class="glass-card">
+        <div class="section-header" style="margin-bottom:10px;">
+          <h2 class="section-title">Recent High-Noise Alert Events</h2>
+          <span id="alertLogCount" class="section-tag">0 events</span>
+        </div>
+        <div id="alertEventsList" class="history-list"></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS TAB -->
+    <section id="tab-settings" class="tab-panel" role="tabpanel">
+      <div class="settings-grid">
+        <!-- General & Classroom Settings -->
+        <div class="glass-card">
+          <h2 class="section-title">General &amp; Classroom Information</h2>
+          <div class="field-grid two-col">
+            <div class="field">
+              <label for="cfgClassroomName">Classroom Name</label>
+              <input id="cfgClassroomName" type="text" maxlength="40" placeholder="Room 101" />
+            </div>
+            <div class="field">
+              <label for="cfgTeacherName">Teacher Name</label>
+              <input id="cfgTeacherName" type="text" maxlength="40" placeholder="Teacher Name" />
+            </div>
+            <div class="field">
+              <label for="cfgMaxCapacity">Maximum Student Capacity</label>
+              <input id="cfgMaxCapacity" type="number" min="1" max="500" />
+            </div>
+            <div class="field">
+              <label for="cfgStudentCount">Current Student Count</label>
+              <input id="cfgStudentCount" type="number" min="0" max="500" />
+            </div>
+          </div>
+
+          <div class="field-grid" style="margin-top:14px;">
+            <div class="field">
+              <label for="cfgThreshold">
+                <span>Noise Threshold (Trigger Level)</span>
+                <span id="valThreshold" class="field-val">-25 dBFS</span>
+              </label>
+              <input id="cfgThreshold" type="range" min="-60" max="-5" step="1" />
+            </div>
+            <div class="field">
+              <label for="cfgSmoothing">
+                <span>Display Smoothing Factor</span>
+                <span id="valSmoothing" class="field-val">0.25</span>
+              </label>
+              <input id="cfgSmoothing" type="range" min="0.10" max="0.60" step="0.05" />
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div style="font-weight:700; font-size:13.5px;">Keep Screen Awake While Monitoring</div>
+                <div style="font-size:12px; color:var(--text-secondary);">Prevents device display from sleeping during active sessions.</div>
+              </div>
+              <label class="switch">
+                <input id="cfgKeepAwake" type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert Sound & Detection Settings -->
+        <div class="glass-card">
+          <div class="section-header">
+            <h2 class="section-title">Alert Sound &amp; Hysteresis Settings</h2>
+            <button type="button" id="btnTestAlertSettings" class="action-btn" style="min-height:40px; padding:6px 12px;">
+              Test Alert Sound
+            </button>
+          </div>
+
+          <div class="field-grid" style="margin-top:12px;">
+            <div class="toggle-row">
+              <div>
+                <div style="font-weight:700; font-size:13.5px;">Enable Sound Alerts (3-Beep Warning)</div>
+                <div style="font-size:12px; color:var(--text-secondary);">Visual warnings continue even when audio alerts are disabled.</div>
+              </div>
+              <label class="switch">
+                <input id="cfgAlertEnabled" type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field-grid two-col" style="margin-top:12px;">
+            <div class="field">
+              <label for="cfgAlertVolume"><span>Alert Volume</span><span id="valAlertVolume" class="field-val">80%</span></label>
+              <input id="cfgAlertVolume" type="range" min="0.05" max="1" step="0.05" />
+            </div>
+            <div class="field">
+              <label for="cfgBeepFreq"><span>Beep Frequency</span><span id="valBeepFreq" class="field-val">1000 Hz</span></label>
+              <input id="cfgBeepFreq" type="range" min="400" max="2400" step="50" />
+            </div>
+            <div class="field">
+              <label for="cfgBeepDuration"><span>Beep Duration</span><span id="valBeepDuration" class="field-val">200 ms</span></label>
+              <input id="cfgBeepDuration" type="range" min="60" max="600" step="20" />
+            </div>
+            <div class="field">
+              <label for="cfgBeepCount"><span>Number of Beeps</span><span id="valBeepCount" class="field-val">3</span></label>
+              <input id="cfgBeepCount" type="range" min="1" max="6" step="1" />
+            </div>
+            <div class="field">
+              <label for="cfgBeepGap"><span>Gap Between Beeps</span><span id="valBeepGap" class="field-val">150 ms</span></label>
+              <input id="cfgBeepGap" type="range" min="50" max="500" step="25" />
+            </div>
+            <div class="field">
+              <label for="cfgDetectionDur"><span>Detection Duration</span><span id="valDetectionDur" class="field-val">2.0 s</span></label>
+              <input id="cfgDetectionDur" type="range" min="0.5" max="10" step="0.5" />
+            </div>
+            <div class="field">
+              <label for="cfgCooldown"><span>Alert Repeat Cooldown</span><span id="valCooldown" class="field-val">10 s</span></label>
+              <input id="cfgCooldown" type="range" min="3" max="60" step="1" />
+            </div>
+            <div class="field">
+              <label for="cfgRecoveryThreshold"><span>Recovery Threshold</span><span id="valRecoveryThreshold" class="field-val">-29 dBFS</span></label>
+              <input id="cfgRecoveryThreshold" type="range" min="-70" max="-8" step="1" />
+            </div>
+            <div class="field">
+              <label for="cfgRecoveryDur"><span>Recovery Duration</span><span id="valRecoveryDur" class="field-val">2.0 s</span></label>
+              <input id="cfgRecoveryDur" type="range" min="0.5" max="10" step="0.5" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Management Settings -->
+      <div class="glass-card">
+        <h2 class="section-title" style="margin-bottom:10px;">Data Management</h2>
+        <div class="btn-row">
+          <button type="button" id="btnSettingsExportCsv" class="action-btn">Export Sessions CSV</button>
+          <button type="button" id="btnSettingsExportAlerts" class="action-btn secondary">Export Alert Events CSV</button>
+          <button type="button" id="btnSettingsClearHistory" class="action-btn danger">Clear Saved History</button>
+          <button type="button" id="btnResetSettings" class="action-btn danger">Reset App Settings</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAGNOSTICS TAB -->
+    <section id="tab-diagnostics" class="tab-panel" role="tabpanel">
+      <div class="glass-card">
+        <div class="section-header" style="margin-bottom:12px;">
+          <h2 class="section-title">System Diagnostics &amp; Audio Engine Health</h2>
+          <button type="button" id="btnRefreshDiag" class="action-btn" style="min-height:42px; padding:6px 12px;">
+            Refresh Status
+          </button>
+        </div>
+
+        <div class="diag-grid">
+          <div class="diag-item">
+            <span class="diag-k">Microphone Permission</span>
+            <span id="diagPermission" class="diag-v">Checking...</span>
+          </div>
+          <div class="diag-item">
+            <span class="diag-k">Microphone Connection</span>
+            <span id="diagConnection" class="diag-v">Disconnected</span>
+          </div>
+          <div class="diag-item">
+            <span class="diag-k">AudioContext Status</span>
+            <span id="diagAudioContext" class="diag-v">Uninitialized</span>
+          </div>
+          <div class="diag-item">
+            <span class="diag-k">Monitoring Status</span>
+            <span id="diagMonitoring" class="diag-v">NOT MONITORING</span>
+          </div>
+          <div class="diag-item">
+            <span class="diag-k">Alert Sound Status</span>
+            <span id="diagAlertSound" class="diag-v">Waiting for Interaction</span>
+          </div>
+          <div class="diag-item">
+            <span class="diag-k">Runtime Environment</span>
+            <span id="diagEnv" class="diag-v">--</span>
+          </div>
+          <div class="diag-item" style="grid-column: 1 / -1;">
+            <span class="diag-k">Last Error Message</span>
+            <span id="diagLastError" class="diag-v">None</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRIVACY FOOTER -->
+    <footer class="privacy-footer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" aria-hidden="true">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <span>Audio is processed locally on your device. No classroom recordings are uploaded or stored.</span>
+    </footer>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div id="confirmModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-box">
+      <h3 id="confirmTitle" class="modal-title">Confirm Action</h3>
+      <p id="confirmMessage" class="modal-body"></p>
+      <div class="modal-actions">
+        <button type="button" id="confirmCancel" class="action-btn" style="background:rgba(159,178,204,0.12); border-color:rgba(159,178,204,0.3);">Cancel</button>
+        <button type="button" id="confirmOk" class="action-btn danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const STORAGE_KEYS = {
+        SETTINGS: "csi_master_creation_settings_v2",
+        HISTORY: "csi_master_creation_history_v2",
+        ALERTS: "csi_master_creation_alerts_v2"
+      };
+
+      const DEFAULT_SETTINGS = {
+        classroomName: "Room 101",
+        teacherName: "Faculty Monitor",
+        maxCapacity: 40,
+        currentStudents: 32,
+        noiseThreshold: -25,
+        smoothingFactor: 0.25,
+        keepScreenAwake: true,
+        alertEnabled: true,
+        alertVolume: 0.8,
+        beepFrequency: 1000,
+        beepDurationMs: 200,
+        beepCount: 3,
+        beepGapMs: 150,
+        detectionDurationSec: 2.0,
+        repeatCooldownSec: 10,
+        recoveryThreshold: -29,
+        recoveryDurationSec: 2.0
+      };
+
+      const STATUS = {
+        NOT_MONITORING: "NOT MONITORING",
+        INITIALIZING: "INITIALIZING",
+        MONITORING: "MONITORING",
+        HIGH_NOISE: "HIGH NOISE",
+        PAUSED: "PAUSED",
+        MIC_ERROR: "MICROPHONE ERROR"
+      };
+
+      const state = {
+        settings: loadSettings(),
+        history: loadJson(STORAGE_KEYS.HISTORY, []),
+        allAlerts: loadJson(STORAGE_KEYS.ALERTS, []),
+        status: STATUS.NOT_MONITORING,
+        isPaused: false,
+        permissionState: "prompt",
+        micLabel: "Disconnected",
+        lastError: "None",
+        audioUnlocked: false,
+        audioBlockedReason: "",
+
+        // Audio nodes
+        audioCtx: null,
+        alertCtx: null,
+        mediaStream: null,
+        sourceNode: null,
+        analyserNode: null,
+        timeData: null,
+        freqData: null,
+        rafId: null,
+        lastFrameTime: 0,
+        lastUiUpdateTime: 0,
+        lastChartSampleTime: 0,
+
+        // Live metrics
+        rawDbfs: -100,
+        smoothedDbfs: -100,
+        hasSample: false,
+
+        // Session counters
+        sessionId: null,
+        sessionStartIso: null,
+        sessionStartLabel: null,
+        activeDurationMs: 0,
+        lastTickMs: 0,
+        sampleCount: 0,
+        dbfsSum: 0,
+        peakDbfs: -100,
+        highNoiseEvents: 0,
+        sessionAlerts: [],
+        chartPoints: [], // { tMs, dbfs, isHigh }
+
+        // Alert & hysteresis timers
+        highNoiseAccumMs: 0,
+        recoveryAccumMs: 0,
+        lastAlertSoundAtMs: 0,
+        suppressionUntilMs: 0,
+        isAlertState: false,
+
+        // Modal callback
+        pendingConfirmAction: null
+      };
+
+      // Cached DOM references
+      const dom = {
+        headerStatusBadge: document.getElementById("headerStatusBadge"),
+        headerStatusText: document.getElementById("headerStatusText"),
+        headerSettingsBtn: document.getElementById("headerSettingsBtn"),
+        liveDate: document.getElementById("liveDate"),
+        liveClock: document.getElementById("liveClock"),
+        headerClassroomName: document.getElementById("headerClassroomName"),
+        headerOccupancy: document.getElementById("headerOccupancy"),
+
+        tabs: Array.from(document.querySelectorAll(".nav-tab")),
+        panels: {
+          monitor: document.getElementById("tab-monitor"),
+          history: document.getElementById("tab-history"),
+          settings: document.getElementById("tab-settings"),
+          diagnostics: document.getElementById("tab-diagnostics")
+        },
+
+        audioNoticeBar: document.getElementById("audioNoticeBar"),
+        audioNoticeText: document.getElementById("audioNoticeText"),
+
+        classroomBanner: document.getElementById("classroomBanner"),
+        bannerTitle: document.getElementById("bannerTitle"),
+        bannerDesc: document.getElementById("bannerDesc"),
+        bannerLiveDb: document.getElementById("bannerLiveDb"),
+        bannerDetectionProgress: document.getElementById("bannerDetectionProgress"),
+
+        meterCard: document.getElementById("meterCard"),
+        gaugeBgArc: document.getElementById("gaugeBgArc"),
+        gaugeValueArc: document.getElementById("gaugeValueArc"),
+        gaugeThresholdTick: document.getElementById("gaugeThresholdTick"),
+        gaugeThresholdDot: document.getElementById("gaugeThresholdDot"),
+        gaugeReading: document.getElementById("gaugeReading"),
+        gaugeCategory: document.getElementById("gaugeCategory"),
+        gaugeSubStatus: document.getElementById("gaugeSubStatus"),
+
+        barCurrentText: document.getElementById("barCurrentText"),
+        barThresholdText: document.getElementById("barThresholdText"),
+        barFill: document.getElementById("barFill"),
+        barThresholdMarker: document.getElementById("barThresholdMarker"),
+        quickThresholdSlider: document.getElementById("quickThresholdSlider"),
+
+        micPermChip: document.getElementById("micPermChip"),
+        btnStart: document.getElementById("btnStart"),
+        btnPause: document.getElementById("btnPause"),
+        btnStop: document.getElementById("btnStop"),
+        btnTestAlert: document.getElementById("btnTestAlert"),
+        btnResetSession: document.getElementById("btnResetSession"),
+        sessionTimer: document.getElementById("sessionTimer"),
+        cooldownStatus: document.getElementById("cooldownStatus"),
+        soundAlertModeLabel: document.getElementById("soundAlertModeLabel"),
+
+        statCurrent: document.getElementById("statCurrent"),
+        statAvg: document.getElementById("statAvg"),
+        statPeak: document.getElementById("statPeak"),
+        statEvents: document.getElementById("statEvents"),
+
+        soundGraphCanvas: document.getElementById("soundGraphCanvas"),
+        graphEmptyMsg: document.getElementById("graphEmptyMsg"),
+        eqCanvas: document.getElementById("eqCanvas"),
+        eqEmptyMsg: document.getElementById("eqEmptyMsg"),
+        eqStateTag: document.getElementById("eqStateTag"),
+
+        historyList: document.getElementById("historyList"),
+        alertEventsList: document.getElementById("alertEventsList"),
+        alertLogCount: document.getElementById("alertLogCount"),
+        btnExportSessionsCsv: document.getElementById("btnExportSessionsCsv"),
+        btnExportAlertsCsv: document.getElementById("btnExportAlertsCsv"),
+        btnClearHistory: document.getElementById("btnClearHistory"),
+
+        // Settings inputs
+        cfgClassroomName: document.getElementById("cfgClassroomName"),
+        cfgTeacherName: document.getElementById("cfgTeacherName"),
+        cfgMaxCapacity: document.getElementById("cfgMaxCapacity"),
+        cfgStudentCount: document.getElementById("cfgStudentCount"),
+        cfgThreshold: document.getElementById("cfgThreshold"),
+        valThreshold: document.getElementById("valThreshold"),
+        cfgSmoothing: document.getElementById("cfgSmoothing"),
+        valSmoothing: document.getElementById("valSmoothing"),
+        cfgKeepAwake: document.getElementById("cfgKeepAwake"),
+        cfgAlertEnabled: document.getElementById("cfgAlertEnabled"),
+        cfgAlertVolume: document.getElementById("cfgAlertVolume"),
+        valAlertVolume: document.getElementById("valAlertVolume"),
+        cfgBeepFreq: document.getElementById("cfgBeepFreq"),
+        valBeepFreq: document.getElementById("valBeepFreq"),
+        cfgBeepDuration: document.getElementById("cfgBeepDuration"),
+        valBeepDuration: document.getElementById("valBeepDuration"),
+        cfgBeepCount: document.getElementById("cfgBeepCount"),
+        valBeepCount: document.getElementById("valBeepCount"),
+        cfgBeepGap: document.getElementById("cfgBeepGap"),
+        valBeepGap: document.getElementById("valBeepGap"),
+        cfgDetectionDur: document.getElementById("cfgDetectionDur"),
+        valDetectionDur: document.getElementById("valDetectionDur"),
+        cfgCooldown: document.getElementById("cfgCooldown"),
+        valCooldown: document.getElementById("valCooldown"),
+        cfgRecoveryThreshold: document.getElementById("cfgRecoveryThreshold"),
+        valRecoveryThreshold: document.getElementById("valRecoveryThreshold"),
+        cfgRecoveryDur: document.getElementById("cfgRecoveryDur"),
+        valRecoveryDur: document.getElementById("valRecoveryDur"),
+        btnTestAlertSettings: document.getElementById("btnTestAlertSettings"),
+        btnSettingsExportCsv: document.getElementById("btnSettingsExportCsv"),
+        btnSettingsExportAlerts: document.getElementById("btnSettingsExportAlerts"),
+        btnSettingsClearHistory: document.getElementById("btnSettingsClearHistory"),
+        btnResetSettings: document.getElementById("btnResetSettings"),
+
+        // Diagnostics
+        btnRefreshDiag: document.getElementById("btnRefreshDiag"),
+        diagPermission: document.getElementById("diagPermission"),
+        diagConnection: document.getElementById("diagConnection"),
+        diagAudioContext: document.getElementById("diagAudioContext"),
+        diagMonitoring: document.getElementById("diagMonitoring"),
+        diagAlertSound: document.getElementById("diagAlertSound"),
+        diagEnv: document.getElementById("diagEnv"),
+        diagLastError: document.getElementById("diagLastError"),
+
+        // Modal & Toast
+        confirmModal: document.getElementById("confirmModal"),
+        confirmTitle: document.getElementById("confirmTitle"),
+        confirmMessage: document.getElementById("confirmMessage"),
+        confirmCancel: document.getElementById("confirmCancel"),
+        confirmOk: document.getElementById("confirmOk"),
+        toast: document.getElementById("toast")
+      };
+
+      // Storage helpers
+      function loadJson(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return fallback;
+          const parsed = JSON.parse(raw);
+          return parsed == null ? fallback : parsed;
+        } catch (err) {
+          return fallback;
+        }
+      }
+
+      function saveJson(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (err) {
+          setLastError("LocalStorage save failed: " + err.message);
+        }
+      }
+
+      function loadSettings() {
+        const stored = loadJson(STORAGE_KEYS.SETTINGS, {});
+        const merged = Object.assign({}, DEFAULT_SETTINGS, stored);
+        if (merged.recoveryThreshold > merged.noiseThreshold - 1) {
+          merged.recoveryThreshold = merged.noiseThreshold - 4;
+        }
+        return merged;
+      }
+
+      function saveSettings() {
+        saveJson(STORAGE_KEYS.SETTINGS, state.settings);
+      }
+
+      // Utility functions
+      function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+      }
+
+      function formatDuration(ms) {
+        const totalSec = Math.max(0, Math.floor(ms / 1000));
+        const hrs = Math.floor(totalSec / 3600);
+        const mins = Math.floor((totalSec % 3600) / 60);
+        const secs = totalSec % 60;
+        return [hrs, mins, secs].map(v => String(v).padStart(2, "0")).join(":");
+      }
+
+      function formatTimeShort(date) {
+        return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+      }
+
+      function dbfsToPercent(db) {
+        return clamp(((db - (-80)) / 80) * 100, 0, 100);
+      }
+
+      function showToast(msg) {
+        dom.toast.textContent = msg;
+        dom.toast.classList.add("show");
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(() => dom.toast.classList.remove("show"), 2600);
+      }
+
+      function setLastError(msg) {
+        state.lastError = msg ? "[" + formatTimeShort(new Date()) + "] " + msg : "None";
+        updateDiagnosticsUI();
+      }
+
+      function showNotice(msg, isWarning) {
+        if (!msg) {
+          dom.audioNoticeBar.classList.remove("visible", "warning");
+          dom.audioNoticeText.textContent = "";
+          return;
+        }
+        dom.audioNoticeText.textContent = msg;
+        dom.audioNoticeBar.classList.add("visible");
+        dom.audioNoticeBar.classList.toggle("warning", Boolean(isWarning));
+      }
+
+      // Clock & Date
+      function updateClock() {
+        const now = new Date();
+        dom.liveDate.textContent = now.toLocaleDateString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric"
+        });
+        dom.liveClock.textContent = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+        });
+      }
+
+      // Tabs
+      function switchTab(tabName) {
+        dom.tabs.forEach(btn => {
+          const active = btn.dataset.tab === tabName;
+          btn.classList.toggle("active", active);
+          btn.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        Object.keys(dom.panels).forEach(key => {
+          dom.panels[key].classList.toggle("active", key === tabName);
+        });
+        if (tabName === "monitor") {
+          requestAnimationFrame(() => {
+            resizeCanvases();
+            drawSoundGraph();
+            drawEqualizer();
+          });
+        } else if (tabName === "history") {
+          renderHistory();
+        } else if (tabName === "diagnostics") {
+          refreshPermissionStatus();
+          updateDiagnosticsUI();
+        }
+      }
+
+      // SVG Circular Gauge Geometry
+      function polarToCartesian(cx, cy, r, angleDeg) {
+        const rad = ((angleDeg - 90) * Math.PI) / 180;
+        return {
+          x: cx + r * Math.cos(rad),
+          y: cy + r * Math.sin(rad)
+        };
+      }
+
+      function describeArc(cx, cy, r, startAngle, endAngle) {
+        const start = polarToCartesian(cx, cy, r, endAngle);
+        const end = polarToCartesian(cx, cy, r, startAngle);
+        const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+        return ["M", start.x, start.y, "A", r, r, 0, largeArcFlag, 0, end.x, end.y].join(" ");
+      }
+
+      function updateGauge(dbfsValue, isAlert) {
+        const cx = 120, cy = 120, r = 92;
+        const startAngle = -135;
+        const sweep = 270;
+
+        dom.gaugeBgArc.setAttribute("d", describeArc(cx, cy, r, startAngle, startAngle + sweep));
+
+        const pct = dbfsValue == null ? 0 : dbfsToPercent(dbfsValue) / 100;
+        const activeSweep = Math.max(2, pct * sweep);
+        if (dbfsValue == null) {
+          dom.gaugeValueArc.setAttribute("d", "");
+        } else {
+          dom.gaugeValueArc.setAttribute("d", describeArc(cx, cy, r, startAngle, startAngle + activeSweep));
+          dom.gaugeValueArc.setAttribute("stroke", isAlert ? "url(#gaugeGradAlert)" : "url(#gaugeGradNormal)");
+        }
+
+        const threshPct = dbfsToPercent(state.settings.noiseThreshold) / 100;
+        const threshAngle = startAngle + threshPct * sweep;
+        const innerPt = polarToCartesian(cx, cy, r - 14, threshAngle);
+        const outerPt = polarToCartesian(cx, cy, r + 14, threshAngle);
+        const dotPt = polarToCartesian(cx, cy, r, threshAngle);
+        dom.gaugeThresholdTick.setAttribute("x1", innerPt.x.toFixed(1));
+        dom.gaugeThresholdTick.setAttribute("y1", innerPt.y.toFixed(1));
+        dom.gaugeThresholdTick.setAttribute("x2", outerPt.x.toFixed(1));
+        dom.gaugeThresholdTick.setAttribute("y2", outerPt.y.toFixed(1));
+        dom.gaugeThresholdDot.setAttribute("cx", dotPt.x.toFixed(1));
+        dom.gaugeThresholdDot.setAttribute("cy", dotPt.y.toFixed(1));
+      }
+
+      function classifyNoise(dbfs) {
+        if (dbfs >= state.settings.noiseThreshold + 8 || dbfs >= -12) {
+          return { label: "Critical Noise", color: "#FF3D57", bannerState: "state-critical", bannerTitle: "CRITICAL NOISE", bannerDesc: "Critical noise level! Immediate quiet required." };
+        }
+        if (dbfs >= state.settings.noiseThreshold || state.isAlertState) {
+          return { label: "Very Loud", color: "#FF3D57", bannerState: "state-high", bannerTitle: "HIGH NOISE", bannerDesc: "High noise detected! Please reduce classroom noise." };
+        }
+        if (dbfs >= state.settings.noiseThreshold - 7) {
+          return { label: "Loud", color: "#FFCA28", bannerState: "state-moderate", bannerTitle: "MODERATE NOISE", bannerDesc: "Noise level is increasing. Please maintain discipline." };
+        }
+        if (dbfs >= -45) {
+          return { label: "Moderate", color: "#FFCA28", bannerState: "state-moderate", bannerTitle: "MODERATE NOISE", bannerDesc: "Classroom activity is moderate. Keep voices controlled." };
+        }
+        if (dbfs >= -60) {
+          return { label: "Quiet", color: "#00E676", bannerState: "state-quiet", bannerTitle: "QUIET CLASSROOM", bannerDesc: "Classroom is maintaining a peaceful environment." };
+        }
+        return { label: "Very Quiet", color: "#00E676", bannerState: "state-quiet", bannerTitle: "QUIET CLASSROOM", bannerDesc: "Classroom is maintaining a peaceful environment." };
+      }
+
+      // Native Android Bridge helpers
+      function setKeepAwakeNative(active) {
+        if (window.AndroidBridge && typeof window.AndroidBridge.setKeepScreenOn === "function") {
+          try {
+            window.AndroidBridge.setKeepScreenOn(Boolean(active && state.settings.keepScreenAwake));
+          } catch (_) {}
+        }
+      }
+
+      async function refreshPermissionStatus() {
+        try {
+          if (window.AndroidBridge && typeof window.AndroidBridge.getNativePermissionState === "function") {
+            const nativePerm = window.AndroidBridge.getNativePermissionState();
+            if (nativePerm === "granted") {
+              state.permissionState = "granted";
+            }
+          }
+          if (navigator.permissions && navigator.permissions.query) {
+            const res = await navigator.permissions.query({ name: "microphone" });
+            if (res && res.state) {
+              state.permissionState = res.state;
+              res.onchange = () => {
+                state.permissionState = res.state;
+                updateControlsAndBadges();
+                updateDiagnosticsUI();
+              };
+            }
+          }
+        } catch (_) {
+          // Permissions API may not support microphone query in all WebViews
+        }
+        updateControlsAndBadges();
+        updateDiagnosticsUI();
+      }
+
+      // Audio Unlock & Electronic 3-Beep Generator
+      function ensureAlertAudioContext() {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+        if (!state.alertCtx || state.alertCtx.state === "closed") {
+          state.alertCtx = new AudioCtx();
+        }
+        return state.alertCtx;
+      }
+
+      async function unlockAlertAudio() {
+        try {
+          const ctx = ensureAlertAudioContext();
+          if (!ctx) {
+            state.audioBlockedReason = "Web Audio API unsupported in this browser.";
+            return false;
+          }
+          if (ctx.state === "suspended") {
+            await ctx.resume();
+          }
+          // Play silent 1-sample buffer to unlock mobile WebView audio reliably
+          const buffer = ctx.createBuffer(1, 1, 22050);
+          const src = ctx.createBufferSource();
+          src.buffer = buffer;
+          src.connect(ctx.destination);
+          src.start(0);
+          state.audioUnlocked = ctx.state === "running";
+          state.audioBlockedReason = state.audioUnlocked ? "" : "Audio playback suspended by browser.";
+          updateDiagnosticsUI();
+          return state.audioUnlocked;
+        } catch (err) {
+          state.audioUnlocked = false;
+          state.audioBlockedReason = "Audio playback blocked: " + err.message;
+          setLastError(state.audioBlockedReason);
+          return false;
+        }
+      }
+
+      async function playAlertBeeps(isTest) {
+        if (!isTest && !state.settings.alertEnabled) {
+          return false;
+        }
+        const ctx = ensureAlertAudioContext();
+        if (!ctx) {
+          showNotice("Audio playback unavailable: Web Audio API is not supported.", true);
+          return false;
+        }
+        if (ctx.state === "suspended") {
+          try {
+            await ctx.resume();
+          } catch (err) {
+            state.audioBlockedReason = "Browser blocked audio playback. Tap Test Alert Sound to enable.";
+            showNotice(state.audioBlockedReason, true);
+            setLastError(state.audioBlockedReason);
+            return false;
+          }
+        }
+        if (ctx.state !== "running") {
+          state.audioBlockedReason = "Browser blocked audio playback until user interaction.";
+          showNotice(state.audioBlockedReason, true);
+          updateDiagnosticsUI();
+          return false;
+        }
+
+        state.audioUnlocked = true;
+        state.audioBlockedReason = "";
+
+        const count = clamp(Number(state.settings.beepCount) || 3, 1, 6);
+        const freq = clamp(Number(state.settings.beepFrequency) || 1000, 200, 4000);
+        const durSec = clamp((Number(state.settings.beepDurationMs) || 200) / 1000, 0.04, 1.0);
+        const gapSec = clamp((Number(state.settings.beepGapMs) || 150) / 1000, 0.03, 1.0);
+        const vol = clamp(Number(state.settings.alertVolume) || 0.8, 0.02, 1.0);
+
+        const totalMs = Math.round(((durSec + gapSec) * count) * 1000);
+        // Suppress microphone alert detection during beeps + 750ms acoustic echo decay
+        state.suppressionUntilMs = performance.now() + totalMs + 750;
+
+        const baseTime = ctx.currentTime + 0.02;
+        for (let i = 0; i < count; i++) {
+          const t0 = baseTime + i * (durSec + gapSec);
+          const t1 = t0 + durSec;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, t0);
+
+          // Soft click-free envelope
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.linearRampToValueAtTime(vol, t0 + 0.01);
+          gain.gain.setValueAtTime(vol, Math.max(t0 + 0.015, t1 - 0.015));
+          gain.gain.exponentialRampToValueAtTime(0.0001, t1);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t0);
+          osc.stop(t1 + 0.02);
+        }
+
+        updateDiagnosticsUI();
+        return true;
+      }
+
+      // Microphone Monitoring Engine
+      async function startMonitoring() {
+        if (state.status === STATUS.INITIALIZING || state.status === STATUS.MONITORING || state.status === STATUS.HIGH_NOISE) {
+          return;
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          state.status = STATUS.MIC_ERROR;
+          const msg = "This browser environment does not support microphone access (MediaDevices API unavailable or insecure context).";
+          setLastError(msg);
+          showNotice(msg, false);
+          updateAllUI();
+          return;
+        }
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) {
+          state.status = STATUS.MIC_ERROR;
+          const msg = "Web Audio API (AudioContext) is not supported on this device.";
+          setLastError(msg);
+          showNotice(msg, false);
+          updateAllUI();
+          return;
+        }
+
+        showNotice("");
+        state.status = STATUS.INITIALIZING;
+        state.isPaused = false;
+        updateControlsAndBadges();
+
+        await unlockAlertAudio();
+
+        let stream = null;
+        try {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+              },
+              video: false
+            });
+          } catch (constraintErr) {
+            // Fallback for Android WebViews or devices rejecting strict constraints
+            if (constraintErr && constraintErr.name === "OverconstrainedError") {
+              stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            } else {
+              throw constraintErr;
+            }
+          }
+        } catch (err) {
+          handleMicError(err);
+          return;
+        }
+
+        try {
+          state.mediaStream = stream;
+          const track = stream.getAudioTracks()[0];
+          state.micLabel = track && track.label ? track.label : "Device Microphone";
+          state.permissionState = "granted";
+
+          if (track) {
+            track.onended = () => {
+              if (state.status === STATUS.MONITORING || state.status === STATUS.HIGH_NOISE) {
+                setLastError("Microphone stream ended unexpectedly.");
+                showNotice("Microphone disconnected or interrupted by system.", false);
+                stopMonitoring(true);
+              }
+            };
+          }
+
+          state.audioCtx = new AudioCtx();
+          if (state.audioCtx.state === "suspended") {
+            await state.audioCtx.resume();
+          }
+
+          state.sourceNode = state.audioCtx.createMediaStreamSource(stream);
+          state.analyserNode = state.audioCtx.createAnalyser();
+          state.analyserNode.fftSize = 2048;
+          state.analyserNode.smoothingTimeConstant = 0.75;
+          state.sourceNode.connect(state.analyserNode);
+
+          state.timeData = new Float32Array(state.analyserNode.fftSize);
+          state.freqData = new Uint8Array(state.analyserNode.frequencyBinCount);
+
+          // Start fresh active session if none active
+          if (!state.sessionId) {
+            beginSessionState();
+          }
+
+          state.status = STATUS.MONITORING;
+          state.lastFrameTime = performance.now();
+          state.lastTickMs = performance.now();
+          state.lastUiUpdateTime = 0;
+          state.lastChartSampleTime = 0;
+          setKeepAwakeNative(true);
+          updateAllUI();
+          scheduleFrame();
+          showToast("Live microphone monitoring started");
+        } catch (err) {
+          cleanupAudioGraph();
+          state.status = STATUS.MIC_ERROR;
+          const msg = "AudioContext initialization failed: " + (err && err.message ? err.message : String(err));
+          setLastError(msg);
+          showNotice(msg, false);
+          updateAllUI();
+        }
+      }
+
+      function handleMicError(err) {
+        cleanupAudioGraph();
+        state.status = STATUS.MIC_ERROR;
+        let msg = "Unable to access microphone.";
+        if (err && (err.name === "NotAllowedError" || err.name === "PermissionDeniedError")) {
+          state.permissionState = "denied";
+          msg = "Microphone permission was denied. Please grant microphone access in your device or browser settings and try again.";
+        } else if (err && (err.name === "NotFoundError" || err.name === "DevicesNotFoundError")) {
+          msg = "No microphone hardware was found on this device.";
+        } else if (err && (err.name === "NotReadableError" || err.name === "TrackStartError")) {
+          msg = "Microphone is currently in use by another application or could not be read.";
+        } else if (err && err.message) {
+          msg = "Microphone error: " + err.message;
+        }
+        state.micLabel = "Disconnected";
+        setLastError(msg);
+        showNotice(msg, false);
+        updateAllUI();
+      }
+
+      function beginSessionState() {
+        const now = new Date();
+        state.sessionId = "sess_" + now.getTime();
+        state.sessionStartIso = now.toISOString();
+        state.sessionStartLabel = formatTimeShort(now);
+        state.activeDurationMs = 0;
+        state.sampleCount = 0;
+        state.dbfsSum = 0;
+        state.peakDbfs = -100;
+        state.highNoiseEvents = 0;
+        state.sessionAlerts = [];
+        state.chartPoints = [];
+        state.highNoiseAccumMs = 0;
+        state.recoveryAccumMs = 0;
+        state.isAlertState = false;
+        state.hasSample = false;
+        state.smoothedDbfs = -100;
+        state.rawDbfs = -100;
+      }
+
+      function cleanupAudioGraph() {
+        if (state.rafId != null) {
+          cancelAnimationFrame(state.rafId);
+          state.rafId = null;
+        }
+        if (state.sourceNode) {
+          try { state.sourceNode.disconnect(); } catch (_) {}
+          state.sourceNode = null;
+        }
+        if (state.analyserNode) {
+          try { state.analyserNode.disconnect(); } catch (_) {}
+          state.analyserNode = null;
+        }
+        if (state.mediaStream) {
+          state.mediaStream.getTracks().forEach(track => {
+            try {
+              track.onended = null;
+              track.stop();
+            } catch (_) {}
+          });
+          state.mediaStream = null;
+        }
+        if (state.audioCtx && state.audioCtx.state !== "closed") {
+          try { state.audioCtx.close(); } catch (_) {}
+        }
+        state.audioCtx = null;
+        state.timeData = null;
+        state.freqData = null;
+        state.micLabel = "Disconnected";
+      }
+
+      function stopMonitoring(isErrorStop) {
+        if (state.status === STATUS.NOT_MONITORING && !state.mediaStream) {
+          return;
+        }
+        cleanupAudioGraph();
+        setKeepAwakeNative(false);
+        document.body.classList.remove("alert-active");
+
+        // Persist completed session if any real samples were collected
+        if (state.sessionId && state.sampleCount > 0) {
+          const endDate = new Date();
+          const avgDb = state.dbfsSum / state.sampleCount;
+          const record = {
+            id: state.sessionId,
+            date: endDate.toLocaleDateString(),
+            isoDate: endDate.toISOString().slice(0, 10),
+            startTime: state.sessionStartLabel || formatTimeShort(endDate),
+            endTime: formatTimeShort(endDate),
+            classroomName: state.settings.classroomName || "Room 101",
+            teacherName: state.settings.teacherName || "Faculty Monitor",
+            avgDbfs: Number(avgDb.toFixed(1)),
+            peakDbfs: Number(state.peakDbfs.toFixed(1)),
+            highNoiseEvents: state.highNoiseEvents,
+            durationSec: Math.round(state.activeDurationMs / 1000),
+            durationLabel: formatDuration(state.activeDurationMs)
+          };
+          state.history.unshift(record);
+          if (state.history.length > 200) state.history.length = 200;
+          saveJson(STORAGE_KEYS.HISTORY, state.history);
+          showToast("Monitoring stopped & session saved to history");
+        }
+
+        state.sessionId = null;
+        state.isPaused = false;
+        state.isAlertState = false;
+        state.highNoiseAccumMs = 0;
+        state.recoveryAccumMs = 0;
+        state.status = isErrorStop ? STATUS.MIC_ERROR : STATUS.NOT_MONITORING;
+        updateAllUI();
+        drawSoundGraph();
+        drawEqualizer();
+      }
+
+      function togglePauseMonitoring() {
+        if (state.status !== STATUS.MONITORING && state.status !== STATUS.HIGH_NOISE && state.status !== STATUS.PAUSED) {
+          return;
+        }
+        if (!state.isPaused) {
+          state.isPaused = true;
+          state.status = STATUS.PAUSED;
+          state.isAlertState = false;
+          state.highNoiseAccumMs = 0;
+          state.recoveryAccumMs = 0;
+          document.body.classList.remove("alert-active");
+          if (state.rafId != null) {
+            cancelAnimationFrame(state.rafId);
+            state.rafId = null;
+          }
+          updateAllUI();
+          drawEqualizer();
+          showToast("Monitoring paused");
+        } else {
+          state.isPaused = false;
+          state.status = STATUS.MONITORING;
+          state.lastFrameTime = performance.now();
+          state.lastTickMs = performance.now();
+          if (state.audioCtx && state.audioCtx.state === "suspended") {
+            state.audioCtx.resume().catch(() => {});
+          }
+          updateAllUI();
+          scheduleFrame();
+          showToast("Monitoring resumed");
+        }
+      }
+
+      function resetSession() {
+        const wasRunning = state.status === STATUS.MONITORING || state.status === STATUS.HIGH_NOISE;
+        beginSessionState();
+        if (wasRunning) {
+          state.status = STATUS.MONITORING;
+          state.lastFrameTime = performance.now();
+          state.lastTickMs = performance.now();
+        }
+        document.body.classList.remove("alert-active");
+        updateAllUI();
+        drawSoundGraph();
+        drawEqualizer();
+        showToast("Current session counters reset (history preserved)");
+      }
+
+      function scheduleFrame() {
+        if (state.rafId != null) cancelAnimationFrame(state.rafId);
+        state.rafId = requestAnimationFrame(processAudioFrame);
+      }
+
+      function processAudioFrame(now) {
+        if (state.isPaused || (state.status !== STATUS.MONITORING && state.status !== STATUS.HIGH_NOISE)) {
+          return;
+        }
+
+        const dt = Math.min(250, Math.max(0, now - state.lastFrameTime));
+        state.lastFrameTime = now;
+        state.activeDurationMs += dt;
+
+        if (!state.analyserNode || !state.timeData) {
+          scheduleFrame();
+          return;
+        }
+
+        // 1. Read real time-domain audio samples
+        state.analyserNode.getFloatTimeDomainData(state.timeData);
+        let sumSq = 0;
+        const len = state.timeData.length;
+        for (let i = 0; i < len; i++) {
+          const sample = state.timeData[i];
+          sumSq += sample * sample;
+        }
+        const rms = Math.sqrt(sumSq / len);
+        // Safe log10 conversion preventing -Infinity or NaN when rms === 0
+        const db = rms > 1e-6 ? clamp(20 * Math.log10(rms), -100, 0) : -100;
+        state.rawDbfs = db;
+
+        if (!state.hasSample) {
+          state.smoothedDbfs = db;
+          state.hasSample = true;
+        } else {
+          const alpha = clamp(Number(state.settings.smoothingFactor) || 0.25, 0.05, 0.8);
+          state.smoothedDbfs = state.smoothedDbfs + alpha * (db - state.smoothedDbfs);
+        }
+
+        // Session stats (skip updating peak/average only during self-beep suppression to avoid beep spike polluting classroom avg/peak)
+        const inSuppression = now < state.suppressionUntilMs;
+        if (!inSuppression) {
+          state.sampleCount += 1;
+          state.dbfsSum += state.smoothedDbfs;
+          if (state.smoothedDbfs > state.peakDbfs) {
+            state.peakDbfs = state.smoothedDbfs;
+          }
+          evaluateNoiseAlerts(now, dt, state.smoothedDbfs);
+        }
+
+        // Chart point sampling (~3 points per second, max 180 points = 60s)
+        if (now - state.lastChartSampleTime >= 330) {
+          state.lastChartSampleTime = now;
+          state.chartPoints.push({
+            tMs: state.activeDurationMs,
+            dbfs: state.smoothedDbfs,
+            isHigh: state.isAlertState || state.smoothedDbfs >= state.settings.noiseThreshold
+          });
+          if (state.chartPoints.length > 180) {
+            state.chartPoints.shift();
+          }
+          drawSoundGraph();
+        }
+
+        // Update Equalizer & UI (~15-20 fps for smooth mobile performance)
+        if (now - state.lastUiUpdateTime >= 60) {
+          state.lastUiUpdateTime = now;
+          updateLiveMeterAndStats(now);
+          drawEqualizer();
+        }
+
+        scheduleFrame();
+      }
+
+      function evaluateNoiseAlerts(now, dt, db) {
+        const threshold = Number(state.settings.noiseThreshold);
+        const recoveryThresh = Math.min(threshold - 1, Number(state.settings.recoveryThreshold));
+        const detectMs = (Number(state.settings.detectionDurationSec) || 2) * 1000;
+        const recoverMs = (Number(state.settings.recoveryDurationSec) || 2) * 1000;
+        const cooldownMs = (Number(state.settings.repeatCooldownSec) || 10) * 1000;
+
+        if (db >= threshold) {
+          state.recoveryAccumMs = 0;
+          state.highNoiseAccumMs += dt;
+
+          if (state.highNoiseAccumMs >= detectMs) {
+            if (!state.isAlertState) {
+              state.isAlertState = true;
+              state.status = STATUS.HIGH_NOISE;
+              state.highNoiseEvents += 1;
+              recordAlertEvent(db, threshold);
+            }
+            if (now - state.lastAlertSoundAtMs >= cooldownMs) {
+              state.lastAlertSoundAtMs = now;
+              if (state.settings.alertEnabled) {
+                playAlertBeeps(false);
+              }
+            }
+          }
+        } else if (state.isAlertState) {
+          if (db <= recoveryThresh) {
+            state.recoveryAccumMs += dt;
+            if (state.recoveryAccumMs >= recoverMs) {
+              state.isAlertState = false;
+              state.status = STATUS.MONITORING;
+              state.highNoiseAccumMs = 0;
+              state.recoveryAccumMs = 0;
+            }
+          } else {
+            // Between recoveryThreshold and threshold: keep alert active, reset recovery timer
+            state.recoveryAccumMs = 0;
+          }
+        } else {
+          // Decay highNoiseAccumMs quickly on brief dips below threshold
+          state.highNoiseAccumMs = Math.max(0, state.highNoiseAccumMs - dt * 2);
+        }
+      }
+
+      function recordAlertEvent(dbfs, threshold) {
+        const now = new Date();
+        const evt = {
+          id: "evt_" + now.getTime() + "_" + Math.floor(Math.random() * 1000),
+          sessionId: state.sessionId || "standalone",
+          date: now.toLocaleDateString(),
+          isoDate: now.toISOString().slice(0, 10),
+          time: formatTimeShort(now),
+          classroomName: state.settings.classroomName || "Room 101",
+          teacherName: state.settings.teacherName || "Faculty Monitor",
+          measuredDbfs: Number(dbfs.toFixed(1)),
+          thresholdDbfs: Number(threshold)
+        };
+        state.sessionAlerts.unshift(evt);
+        state.allAlerts.unshift(evt);
+        if (state.allAlerts.length > 500) state.allAlerts.length = 500;
+        saveJson(STORAGE_KEYS.ALERTS, state.allAlerts);
+      }
+
+      // UI Rendering
+      function updateAllUI() {
+        updateHeaderInfo();
+        updateControlsAndBadges();
+        updateLiveMeterAndStats(performance.now());
+        updateDiagnosticsUI();
+      }
+
+      function updateHeaderInfo() {
+        dom.headerClassroomName.textContent = state.settings.classroomName || "Room 101";
+        dom.headerOccupancy.textContent =
+          (Number(state.settings.currentStudents) || 0) + " / " + (Number(state.settings.maxCapacity) || 40);
+      }
+
+      function updateControlsAndBadges() {
+        const badge = dom.headerStatusBadge;
+        badge.className = "status-badge";
+        if (state.status === STATUS.NOT_MONITORING) badge.classList.add("status-not-monitoring");
+        else if (state.status === STATUS.INITIALIZING) badge.classList.add("status-initializing");
+        else if (state.status === STATUS.MONITORING) badge.classList.add("status-monitoring");
+        else if (state.status === STATUS.HIGH_NOISE) badge.classList.add("status-high-noise");
+        else if (state.status === STATUS.PAUSED) badge.classList.add("status-paused");
+        else badge.classList.add("status-error");
+
+        dom.headerStatusText.textContent = state.status;
+
+        const isActive = state.status === STATUS.MONITORING || state.status === STATUS.HIGH_NOISE;
+        const isPaused = state.status === STATUS.PAUSED;
+        const isInit = state.status === STATUS.INITIALIZING;
+
+        dom.btnStart.disabled = isActive || isPaused || isInit;
+        dom.btnPause.disabled = !isActive && !isPaused;
+        dom.btnStop.disabled = !isActive && !isPaused;
+        dom.btnPause.querySelector("span").textContent = isPaused ? "Resume" : "Pause";
+
+        const permText = state.permissionState === "granted"
+          ? "Mic: Granted"
+          : state.permissionState === "denied"
+            ? "Mic: Denied"
+            : "Mic: Prompt";
+        dom.micPermChip.textContent = permText;
+        dom.soundAlertModeLabel.textContent = state.settings.alertEnabled ? "Enabled" : "Muted (Visual Only)";
+        dom.eqStateTag.textContent = isActive ? "Live Spectrum" : isPaused ? "Paused" : "Inactive";
+      }
+
+      function updateLiveMeterAndStats(now) {
+        const isLive = state.status === STATUS.MONITORING || state.status === STATUS.HIGH_NOISE;
+        const hasVal = (isLive || state.status === STATUS.PAUSED) && state.hasSample;
+        const db = hasVal ? state.smoothedDbfs : null;
+
+        document.body.classList.toggle("alert-active", state.status === STATUS.HIGH_NOISE);
+        dom.meterCard.classList.toggle("alert-card", state.status === STATUS.HIGH_NOISE);
+
+        // Status badge sync if alert flipped
+        updateControlsAndBadges();
+
+        // Gauge & Horizontal Bar
+        updateGauge(db, state.status === STATUS.HIGH_NOISE);
+        dom.barThresholdText.textContent = state.settings.noiseThreshold + " dBFS";
+        dom.barThresholdMarker.style.left = dbfsToPercent(state.settings.noiseThreshold) + "%";
+        dom.quickThresholdSlider.value = state.settings.noiseThreshold;
+
+        if (db == null) {
+          dom.gaugeReading.textContent = "--.-";
+          dom.gaugeReading.style.color = "#FFFFFF";
+          dom.gaugeCategory.textContent = state.status === STATUS.MIC_ERROR ? "Mic Error" : "Standby";
+          dom.gaugeCategory.style.color = "#9FB2CC";
+          dom.gaugeSubStatus.textContent = state.status;
+          dom.barCurrentText.textContent = "--.- dBFS";
+          dom.barFill.style.width = "0%";
+          dom.bannerLiveDb.textContent = "--.- dBFS";
+        } else {
+          const formatted = db.toFixed(1);
+          const cat = classifyNoise(db);
+          dom.gaugeReading.textContent = formatted;
+          dom.gaugeReading.style.color = state.status === STATUS.HIGH_NOISE ? "#FF3D57" : cat.color;
+          dom.gaugeCategory.textContent = cat.label;
+          dom.gaugeCategory.style.color = cat.color;
+          dom.gaugeSubStatus.textContent = now < state.suppressionUntilMs ? "Beep Guard Active" : state.status;
+          dom.barCurrentText.textContent = formatted + " dBFS";
+          dom.barFill.style.width = dbfsToPercent(db).toFixed(1) + "%";
+          dom.bannerLiveDb.textContent = formatted + " dBFS";
+
+          // Update Classroom Banner dynamically from real sound level
+          const bannerState = state.status === STATUS.HIGH_NOISE
+            ? (cat.bannerState === "state-critical" ? "state-critical" : "state-high")
+            : cat.bannerState;
+          dom.classroomBanner.className = "classroom-banner " + bannerState;
+          dom.bannerTitle.textContent = state.status === STATUS.HIGH_NOISE
+            ? (cat.bannerState === "state-critical" ? "CRITICAL NOISE ALERT" : "HIGH NOISE ALERT")
+            : cat.bannerTitle;
+          dom.bannerDesc.textContent = state.status === STATUS.HIGH_NOISE
+            ? (cat.bannerState === "state-critical" ? "Critical noise level! Immediate quiet required." : "High noise detected! Please reduce classroom noise immediately.")
+            : cat.bannerDesc;
+        }
+
+        if (!isLive && state.status !== STATUS.PAUSED) {
+          dom.classroomBanner.className = "classroom-banner";
+          dom.bannerTitle.textContent = state.status === STATUS.MIC_ERROR ? "MICROPHONE UNAVAILABLE" : "STANDBY — READY TO MONITOR";
+          dom.bannerDesc.textContent = state.status === STATUS.MIC_ERROR
+            ? state.lastError
+            : "Press Start Monitoring to analyze real classroom microphone levels locally.";
+        } else if (state.status === STATUS.PAUSED) {
+          dom.classroomBanner.className = "classroom-banner state-moderate";
+          dom.bannerTitle.textContent = "MONITORING PAUSED";
+          dom.bannerDesc.textContent = "Microphone detection is paused. Paused duration is not counted.";
+        }
+
+        dom.bannerDetectionProgress.textContent = "Threshold: " + state.settings.noiseThreshold + " dBFS";
+
+        // Stats cards
+        dom.sessionTimer.textContent = formatDuration(state.activeDurationMs);
+        dom.statCurrent.textContent = db == null ? "--.-" : db.toFixed(1);
+        dom.statAvg.textContent = state.sampleCount > 0 ? (state.dbfsSum / state.sampleCount).toFixed(1) : "--.-";
+        dom.statPeak.textContent = state.sampleCount > 0 ? state.peakDbfs.toFixed(1) : "--.-";
+        dom.statEvents.textContent = String(state.highNoiseEvents);
+
+        // Cooldown countdown
+        const cooldownMs = (Number(state.settings.repeatCooldownSec) || 10) * 1000;
+        const remMs = state.lastAlertSoundAtMs > 0 ? Math.max(0, cooldownMs - (now - state.lastAlertSoundAtMs)) : 0;
+        dom.cooldownStatus.textContent = remMs > 0 ? Math.ceil(remMs / 1000) + "s" : "Ready";
+      }
+
+      // Responsive Canvas Rendering
+      function resizeCanvases() {
+        [dom.soundGraphCanvas, dom.eqCanvas].forEach(canvas => {
+          const rect = canvas.parentElement.getBoundingClientRect();
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const w = Math.max(100, Math.floor(rect.width));
+          const h = Math.max(100, Math.floor(rect.height));
+          if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+            canvas.width = Math.floor(w * dpr);
+            canvas.height = Math.floor(h * dpr);
+          }
+        });
+      }
+
+      function drawSoundGraph() {
+        const canvas = dom.soundGraphCanvas;
+        const ctx = canvas.getContext("2d");
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = canvas.width / dpr;
+        const h = canvas.height / dpr;
+        ctx.save();
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, w, h);
+
+        const padL = 42, padR = 12, padT = 14, padB = 24;
+        const plotW = Math.max(40, w - padL - padR);
+        const plotH = Math.max(40, h - padT - padB);
+        const minDb = -80, maxDb = 0;
+
+        // Horizontal dBFS grid lines
+        ctx.font = "10px ui-monospace, monospace";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        [-80, -60, -40, -20, 0].forEach(val => {
+          const y = padT + (1 - (val - minDb) / (maxDb - minDb)) * plotH;
+          ctx.strokeStyle = "rgba(159, 178, 204, 0.14)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(padL, y);
+          ctx.lineTo(w - padR, y);
+          ctx.stroke();
+          ctx.fillStyle = "#6C82A3";
+          ctx.fillText(val + "", padL - 6, y);
+        });
+
+        // Threshold dashed line
+        const threshY = padT + (1 - (clamp(state.settings.noiseThreshold, minDb, maxDb) - minDb) / (maxDb - minDb)) * plotH;
+        ctx.save();
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = "#FF3D57";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(padL, threshY);
+        ctx.lineTo(w - padR, threshY);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.fillStyle = "#FF3D57";
+        ctx.textAlign = "left";
+        ctx.fillText("Threshold " + state.settings.noiseThreshold + " dBFS", padL + 4, Math.max(padT + 8, threshY - 8));
+
+        const pts = state.chartPoints;
+        dom.graphEmptyMsg.style.display = pts.length === 0 ? "flex" : "none";
+
+        if (pts.length > 1) {
+          const maxPts = 180;
+          const stepX = plotW / (maxPts - 1);
+          const startIdx = maxPts - pts.length;
+
+          // Highlight high-noise vertical bands
+          for (let i = 0; i < pts.length; i++) {
+            if (pts[i].isHigh) {
+              const x = padL + (startIdx + i) * stepX;
+              ctx.fillStyle = "rgba(255, 61, 87, 0.18)";
+              ctx.fillRect(x - stepX * 0.5, padT, stepX + 1, plotH);
+            }
+          }
+
+          // Area fill
+          ctx.beginPath();
+          pts.forEach((p, i) => {
+            const x = padL + (startIdx + i) * stepX;
+            const y = padT + (1 - (clamp(p.dbfs, minDb, maxDb) - minDb) / (maxDb - minDb)) * plotH;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          const lastX = padL + (startIdx + pts.length - 1) * stepX;
+          const firstX = padL + startIdx * stepX;
+          ctx.lineTo(lastX, padT + plotH);
+          ctx.lineTo(firstX, padT + plotH);
+          ctx.closePath();
+          const areaGrad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+          areaGrad.addColorStop(0, "rgba(0, 229, 255, 0.34)");
+          areaGrad.addColorStop(1, "rgba(0, 229, 255, 0.02)");
+          ctx.fillStyle = areaGrad;
+          ctx.fill();
+
+          // Signal stroke colored by segment
+          ctx.lineWidth = 2.2;
+          ctx.lineJoin = "round";
+          for (let i = 1; i < pts.length; i++) {
+            const x0 = padL + (startIdx + i - 1) * stepX;
+            const y0 = padT + (1 - (clamp(pts[i - 1].dbfs, minDb, maxDb) - minDb) / (maxDb - minDb)) * plotH;
+            const x1 = padL + (startIdx + i) * stepX;
+            const y1 = padT + (1 - (clamp(pts[i].dbfs, minDb, maxDb) - minDb) / (maxDb - minDb)) * plotH;
+            ctx.strokeStyle = pts[i].isHigh ? "#FF3D57" : "#00E5FF";
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.stroke();
+          }
+
+          // Time axis labels
+          ctx.fillStyle = "#6C82A3";
+          ctx.textAlign = "left";
+          ctx.fillText(formatDuration(pts[0].tMs), padL, h - 8);
+          ctx.textAlign = "right";
+          ctx.fillText(formatDuration(pts[pts.length - 1].tMs), w - padR, h - 8);
+        }
+
+        ctx.restore();
+      }
+
+      function drawEqualizer() {
+        const canvas = dom.eqCanvas;
+        const ctx = canvas.getContext("2d");
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = canvas.width / dpr;
+        const h = canvas.height / dpr;
+        ctx.save();
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, w, h);
+
+        const isActive = (state.status === STATUS.MONITORING || state.status === STATUS.HIGH_NOISE) && state.analyserNode && state.freqData;
+        dom.eqEmptyMsg.style.display = isActive ? "none" : "flex";
+
+        const barCount = 28;
+        const gap = 4;
+        const padX = 12, padY = 14;
+        const usableW = w - padX * 2;
+        const barW = Math.max(3, (usableW - gap * (barCount - 1)) / barCount);
+        const maxH = h - padY * 2;
+
+        if (!isActive) {
+          // Draw flat inactive baseline bars (zero fake animation)
+          ctx.fillStyle = "rgba(159, 178, 204, 0.16)";
+          for (let i = 0; i < barCount; i++) {
+            const x = padX + i * (barW + gap);
+            ctx.fillRect(x, h - padY - 4, barW, 4);
+          }
+          ctx.restore();
+          return;
+        }
+
+        state.analyserNode.getByteFrequencyData(state.freqData);
+        const usableBins = Math.floor(state.freqData.length * 0.65);
+
+        for (let i = 0; i < barCount; i++) {
+          // Logarithmic bin grouping across voice/classroom spectrum
+          const startBin = Math.floor(Math.pow(i / barCount, 1.55) * usableBins);
+          const endBin = Math.max(startBin + 1, Math.floor(Math.pow((i + 1) / barCount, 1.55) * usableBins));
+          let sum = 0;
+          let count = 0;
+          for (let b = startBin; b < endBin && b < state.freqData.length; b++) {
+            sum += state.freqData[b];
+            count++;
+          }
+          const avg = count > 0 ? sum / count : 0;
+          const norm = avg / 255;
+          const barH = Math.max(4, norm * maxH);
+          const x = padX + i * (barW + gap);
+          const y = h - padY - barH;
+
+          const grad = ctx.createLinearGradient(0, y, 0, h - padY);
+          if (state.status === STATUS.HIGH_NOISE) {
+            grad.addColorStop(0, "#FF3D57");
+            grad.addColorStop(1, "#FF9100");
+          } else {
+            grad.addColorStop(0, "#00E5FF");
+            grad.addColorStop(0.55, "#2979FF");
+            grad.addColorStop(1, "#00E676");
+          }
+          ctx.fillStyle = grad;
+          ctx.fillRect(x, y, barW, barH);
+        }
+
+        ctx.restore();
+      }
+
+      // History & CSV Export
+      function renderHistory() {
+        if (!state.history.length) {
+          dom.historyList.innerHTML = '<div class="empty-state">No completed monitoring sessions recorded yet. Start and stop a monitoring session to save its summary.</div>';
+        } else {
+          dom.historyList.innerHTML = state.history.map(item => `
+            <article class="history-item">
+              <div class="history-top">
+                <div>
+                  <div style="font-weight:800; font-size:14.5px;">${escapeHtml(item.classroomName)} <span style="color:var(--text-secondary); font-weight:500;">• ${escapeHtml(item.teacherName)}</span></div>
+                  <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${escapeHtml(item.date)} &nbsp;|&nbsp; ${escapeHtml(item.startTime)} – ${escapeHtml(item.endTime)}</div>
+                </div>
+                <button type="button" class="action-btn danger" data-delete-session="${escapeHtml(item.id)}" style="min-height:40px; padding:6px 11px;">Delete</button>
+              </div>
+              <div class="history-metrics">
+                <div class="hm-box"><div class="hm-label">Average</div><div class="hm-val">${item.avgDbfs} dBFS</div></div>
+                <div class="hm-box"><div class="hm-label">Peak</div><div class="hm-val" style="color:var(--yellow);">${item.peakDbfs} dBFS</div></div>
+                <div class="hm-box"><div class="hm-label">High Noise Events</div><div class="hm-val" style="color:${item.highNoiseEvents > 0 ? "var(--red)" : "var(--green)"};">${item.highNoiseEvents}</div></div>
+                <div class="hm-box"><div class="hm-label">Duration</div><div class="hm-val">${escapeHtml(item.durationLabel)}</div></div>
+              </div>
+            </article>
+          `).join("");
+        }
+
+        dom.alertLogCount.textContent = state.allAlerts.length + (state.allAlerts.length === 1 ? " event" : " events");
+        if (!state.allAlerts.length) {
+          dom.alertEventsList.innerHTML = '<div class="empty-state">No high-noise alert events recorded yet.</div>';
+        } else {
+          dom.alertEventsList.innerHTML = state.allAlerts.slice(0, 60).map(ev => `
+            <div class="history-item" style="padding:10px 12px;">
+              <div class="history-top" style="align-items:center;">
+                <div>
+                  <strong style="color:var(--red);">HIGH NOISE EVENT</strong>
+                  <span style="color:var(--text-secondary); font-size:12.5px;"> • ${escapeHtml(ev.classroomName)}</span>
+                  <div style="font-size:12px; color:var(--text-secondary);">${escapeHtml(ev.date)} at ${escapeHtml(ev.time)}</div>
+                </div>
+                <div class="mono-value" style="font-size:13px; text-align:right;">
+                  <div>Measured: <strong style="color:var(--red);">${ev.measuredDbfs} dBFS</strong></div>
+                  <div style="color:var(--text-muted); font-size:11.5px;">Threshold: ${ev.thresholdDbfs} dBFS</div>
+                </div>
+              </div>
+            </div>
+          `).join("");
+        }
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function csvEscape(val) {
+        const s = String(val == null ? "" : val);
+        return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      }
+
+      function downloadCsv(filename, csvText) {
+        if (window.AndroidBridge && typeof window.AndroidBridge.saveCsvFile === "function") {
+          try {
+            window.AndroidBridge.saveCsvFile(filename, csvText);
+            return;
+          } catch (err) {
+            setLastError("Native CSV export failed: " + err.message);
+          }
+        }
+        const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        showToast("Downloaded " + filename);
+      }
+
+      function exportSessionsCsv() {
+        if (!state.history.length) {
+          showToast("No completed sessions available to export");
+          return;
+        }
+        const header = [
+          "Classroom Name",
+          "Teacher Name",
+          "Date",
+          "Session Start Time",
+          "Session End Time",
+          "Monitoring Duration",
+          "Average dBFS",
+          "Peak dBFS",
+          "High Noise Alerts"
+        ];
+        const rows = state.history.map(s => [
+          s.classroomName,
+          s.teacherName,
+          s.date,
+          s.startTime,
+          s.endTime,
+          s.durationLabel,
+          s.avgDbfs,
+          s.peakDbfs,
+          s.highNoiseEvents
+        ].map(csvEscape).join(","));
+        const csv = [header.join(","), ...rows].join("\n");
+        const stamp = new Date().toISOString().slice(0, 10);
+        downloadCsv("classroom_sound_sessions_" + stamp + ".csv", csv);
+      }
+
+      function exportAlertsCsv() {
+        if (!state.allAlerts.length) {
+          showToast("No high-noise alert events available to export");
+          return;
+        }
+        const header = [
+          "Date",
+          "Time",
+          "Classroom Name",
+          "Teacher Name",
+          "Measured dBFS",
+          "Configured Threshold dBFS",
+          "Session ID"
+        ];
+        const rows = state.allAlerts.map(a => [
+          a.date,
+          a.time,
+          a.classroomName,
+          a.teacherName,
+          a.measuredDbfs,
+          a.thresholdDbfs,
+          a.sessionId
+        ].map(csvEscape).join(","));
+        const csv = [header.join(","), ...rows].join("\n");
+        const stamp = new Date().toISOString().slice(0, 10);
+        downloadCsv("classroom_sound_alerts_" + stamp + ".csv", csv);
+      }
+
+      // Settings Binding & Sync
+      function syncSettingsToInputs() {
+        const s = state.settings;
+        dom.cfgClassroomName.value = s.classroomName;
+        dom.cfgTeacherName.value = s.teacherName;
+        dom.cfgMaxCapacity.value = s.maxCapacity;
+        dom.cfgStudentCount.value = s.currentStudents;
+        dom.cfgThreshold.value = s.noiseThreshold;
+        dom.valThreshold.textContent = s.noiseThreshold + " dBFS";
+        dom.cfgSmoothing.value = s.smoothingFactor;
+        dom.valSmoothing.textContent = Number(s.smoothingFactor).toFixed(2);
+        dom.cfgKeepAwake.checked = Boolean(s.keepScreenAwake);
+        dom.cfgAlertEnabled.checked = Boolean(s.alertEnabled);
+        dom.cfgAlertVolume.value = s.alertVolume;
+        dom.valAlertVolume.textContent = Math.round(s.alertVolume * 100) + "%";
+        dom.cfgBeepFreq.value = s.beepFrequency;
+        dom.valBeepFreq.textContent = s.beepFrequency + " Hz";
+        dom.cfgBeepDuration.value = s.beepDurationMs;
+        dom.valBeepDuration.textContent = s.beepDurationMs + " ms";
+        dom.cfgBeepCount.value = s.beepCount;
+        dom.valBeepCount.textContent = s.beepCount;
+        dom.cfgBeepGap.value = s.beepGapMs;
+        dom.valBeepGap.textContent = s.beepGapMs + " ms";
+        dom.cfgDetectionDur.value = s.detectionDurationSec;
+        dom.valDetectionDur.textContent = Number(s.detectionDurationSec).toFixed(1) + " s";
+        dom.cfgCooldown.value = s.repeatCooldownSec;
+        dom.valCooldown.textContent = s.repeatCooldownSec + " s";
+        dom.cfgRecoveryThreshold.value = s.recoveryThreshold;
+        dom.valRecoveryThreshold.textContent = s.recoveryThreshold + " dBFS";
+        dom.cfgRecoveryDur.value = s.recoveryDurationSec;
+        dom.valRecoveryDur.textContent = Number(s.recoveryDurationSec).toFixed(1) + " s";
+        dom.quickThresholdSlider.value = s.noiseThreshold;
+      }
+
+      function bindSettingsListeners() {
+        const updateThreshold = (val) => {
+          const t = clamp(Number(val), -60, -5);
+          state.settings.noiseThreshold = t;
+          if (state.settings.recoveryThreshold >= t) {
+            state.settings.recoveryThreshold = Math.max(-70, t - 4);
+          }
+          saveSettings();
+          syncSettingsToInputs();
+          updateLiveMeterAndStats(performance.now());
+          drawSoundGraph();
+        };
+
+        dom.quickThresholdSlider.addEventListener("input", e => updateThreshold(e.target.value));
+        dom.cfgThreshold.addEventListener("input", e => updateThreshold(e.target.value));
+
+        dom.cfgClassroomName.addEventListener("input", e => {
+          state.settings.classroomName = e.target.value || "Room 101";
+          saveSettings();
+          updateHeaderInfo();
+        });
+        dom.cfgTeacherName.addEventListener("input", e => {
+          state.settings.teacherName = e.target.value || "Faculty Monitor";
+          saveSettings();
+        });
+        dom.cfgMaxCapacity.addEventListener("input", e => {
+          state.settings.maxCapacity = Math.max(1, Number(e.target.value) || 40);
+          saveSettings();
+          updateHeaderInfo();
+        });
+        dom.cfgStudentCount.addEventListener("input", e => {
+          state.settings.currentStudents = Math.max(0, Number(e.target.value) || 0);
+          saveSettings();
+          updateHeaderInfo();
+        });
+
+        dom.cfgSmoothing.addEventListener("input", e => {
+          state.settings.smoothingFactor = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgKeepAwake.addEventListener("change", e => {
+          state.settings.keepScreenAwake = e.target.checked;
+          saveSettings();
+          setKeepAwakeNative(state.status === STATUS.MONITORING || state.status === STATUS.HIGH_NOISE);
+        });
+        dom.cfgAlertEnabled.addEventListener("change", e => {
+          state.settings.alertEnabled = e.target.checked;
+          saveSettings();
+          updateControlsAndBadges();
+          updateDiagnosticsUI();
+        });
+        dom.cfgAlertVolume.addEventListener("input", e => {
+          state.settings.alertVolume = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgBeepFreq.addEventListener("input", e => {
+          state.settings.beepFrequency = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgBeepDuration.addEventListener("input", e => {
+          state.settings.beepDurationMs = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgBeepCount.addEventListener("input", e => {
+          state.settings.beepCount = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgBeepGap.addEventListener("input", e => {
+          state.settings.beepGapMs = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgDetectionDur.addEventListener("input", e => {
+          state.settings.detectionDurationSec = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgCooldown.addEventListener("input", e => {
+          state.settings.repeatCooldownSec = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgRecoveryThreshold.addEventListener("input", e => {
+          const val = Number(e.target.value);
+          state.settings.recoveryThreshold = Math.min(val, state.settings.noiseThreshold - 1);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+        dom.cfgRecoveryDur.addEventListener("input", e => {
+          state.settings.recoveryDurationSec = Number(e.target.value);
+          saveSettings();
+          syncSettingsToInputs();
+        });
+      }
+
+      // Diagnostics Panel
+      function updateDiagnosticsUI() {
+        dom.diagPermission.textContent = state.permissionState;
+        dom.diagConnection.textContent = state.mediaStream ? "Connected (" + state.micLabel + ")" : "Disconnected";
+        dom.diagAudioContext.textContent = state.audioCtx
+          ? state.audioCtx.state + " (" + state.audioCtx.sampleRate + " Hz)"
+          : "Uninitialized";
+        dom.diagMonitoring.textContent = state.status;
+
+        if (!state.settings.alertEnabled) {
+          dom.diagAlertSound.textContent = "Disabled by User (Visual Alerts Active)";
+        } else if (state.audioBlockedReason) {
+          dom.diagAlertSound.textContent = state.audioBlockedReason;
+        } else if (state.audioUnlocked) {
+          dom.diagAlertSound.textContent = "Unlocked & Ready";
+        } else {
+          dom.diagAlertSound.textContent = "Waiting for User Interaction";
+        }
+
+        const isAndroid = Boolean(window.AndroidBridge && window.AndroidBridge.isAndroidWebView && window.AndroidBridge.isAndroidWebView());
+        const secure = window.isSecureContext ? "Secure Context" : "Non-Secure Context";
+        dom.diagEnv.textContent = (isAndroid ? "Android WebView" : "Web Browser") + " • " + secure;
+        dom.diagLastError.textContent = state.lastError || "None";
+      }
+
+      // Confirmation Dialog
+      function openConfirm(title, message, onConfirm) {
+        dom.confirmTitle.textContent = title;
+        dom.confirmMessage.textContent = message;
+        state.pendingConfirmAction = onConfirm;
+        dom.confirmModal.classList.add("open");
+      }
+
+      function closeConfirm() {
+        dom.confirmModal.classList.remove("open");
+        state.pendingConfirmAction = null;
+      }
+
+      // Event Wiring
+      function initEvents() {
+        dom.tabs.forEach(btn => {
+          btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+        });
+        dom.headerSettingsBtn.addEventListener("click", () => switchTab("settings"));
+
+        dom.btnStart.addEventListener("click", startMonitoring);
+        dom.btnPause.addEventListener("click", togglePauseMonitoring);
+        dom.btnStop.addEventListener("click", () => stopMonitoring(false));
+        dom.btnResetSession.addEventListener("click", resetSession);
+
+        const handleTestSound = async () => {
+          await unlockAlertAudio();
+          const ok = await playAlertBeeps(true);
+          if (ok) showToast("Playing " + state.settings.beepCount + "-beep test alert");
+        };
+        dom.btnTestAlert.addEventListener("click", handleTestSound);
+        dom.btnTestAlertSettings.addEventListener("click", handleTestSound);
+
+        dom.btnExportSessionsCsv.addEventListener("click", exportSessionsCsv);
+        dom.btnSettingsExportCsv.addEventListener("click", exportSessionsCsv);
+        dom.btnExportAlertsCsv.addEventListener("click", exportAlertsCsv);
+        dom.btnSettingsExportAlerts.addEventListener("click", exportAlertsCsv);
+
+        const confirmClearHistory = () => {
+          openConfirm(
+            "Clear Monitoring History",
+            "Delete all saved monitoring sessions and alert event logs from this device? This action cannot be undone.",
+            () => {
+              state.history = [];
+              state.allAlerts = [];
+              saveJson(STORAGE_KEYS.HISTORY, []);
+              saveJson(STORAGE_KEYS.ALERTS, []);
+              renderHistory();
+              showToast("All monitoring history cleared");
+            }
+          );
+        };
+        dom.btnClearHistory.addEventListener("click", confirmClearHistory);
+        dom.btnSettingsClearHistory.addEventListener("click", confirmClearHistory);
+
+        dom.historyList.addEventListener("click", e => {
+          const btn = e.target.closest("[data-delete-session]");
+          if (!btn) return;
+          const id = btn.getAttribute("data-delete-session");
+          openConfirm("Delete Session Record", "Remove this monitoring session from local history?", () => {
+            state.history = state.history.filter(item => item.id !== id);
+            saveJson(STORAGE_KEYS.HISTORY, state.history);
+            renderHistory();
+            showToast("Session deleted");
+          });
+        });
+
+        dom.btnResetSettings.addEventListener("click", () => {
+          openConfirm(
+            "Reset Application Settings",
+            "Restore all classroom profile, threshold, and alert sound settings to factory defaults?",
+            () => {
+              state.settings = Object.assign({}, DEFAULT_SETTINGS);
+              saveSettings();
+              syncSettingsToInputs();
+              updateAllUI();
+              drawSoundGraph();
+              showToast("Settings restored to defaults");
+            }
+          );
+        });
+
+        dom.confirmCancel.addEventListener("click", closeConfirm);
+        dom.confirmOk.addEventListener("click", () => {
+          const fn = state.pendingConfirmAction;
+          closeConfirm();
+          if (typeof fn === "function") fn();
+        });
+
+        dom.btnRefreshDiag.addEventListener("click", () => {
+          refreshPermissionStatus();
+          updateDiagnosticsUI();
+          showToast("Diagnostics refreshed");
+        });
+
+        // Recover gracefully when returning from background
+        document.addEventListener("visibilitychange", async () => {
+          if (document.visibilityState === "visible") {
+            if (state.audioCtx && state.audioCtx.state === "suspended" && !state.isPaused) {
+              try {
+                await state.audioCtx.resume();
+                state.lastFrameTime = performance.now();
+              } catch (err) {
+                setLastError("AudioContext resume failed after background: " + err.message);
+              }
+            }
+            if (state.alertCtx && state.alertCtx.state === "suspended") {
+              state.alertCtx.resume().catch(() => {});
+            }
+            updateDiagnosticsUI();
+          }
+        });
+
+        window.addEventListener("resize", () => {
+          resizeCanvases();
+          drawSoundGraph();
+          drawEqualizer();
+        });
+
+        window.addEventListener("androidMicGranted", () => {
+          state.permissionState = "granted";
+          showNotice("");
+          updateControlsAndBadges();
+          updateDiagnosticsUI();
+        });
+
+        window.addEventListener("beforeunload", () => {
+          cleanupAudioGraph();
+        });
+      }
+
+      // Bootstrap
+      function init() {
+        syncSettingsToInputs();
+        bindSettingsListeners();
+        initEvents();
+        updateClock();
+        setInterval(updateClock, 1000);
+        resizeCanvases();
+        updateAllUI();
+        drawSoundGraph();
+        drawEqualizer();
+        renderHistory();
+        refreshPermissionStatus();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

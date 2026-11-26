@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Classroom Sound Intelligence</string>
+    <string name="mic_permission_rationale">Microphone access is required to monitor classroom sound levels locally on your device. No recordings are uploaded or stored.</string>
+    <string name="grant_microphone_permission">Enable Microphone</string>
+    <string name="open_app_settings">Open Settings</string>
+</resources>
